@@ -239,12 +239,16 @@
     #clients,
     #how,
     #testimonials,
-    #pricing,
     #contact,
     footer,
     .ticker {
       position: relative;
       overflow: hidden;
+    }
+
+    #pricing {
+      position: relative;
+      overflow: visible;
     }
 
     #video {
@@ -2679,7 +2683,7 @@
     }
 
     /* SECTION SHELL */
-    .wrap { max-width: 1160px; margin: auto; padding: clamp(64px, 11vw, 120px) clamp(16px, 4vw, 36px); width: 100%; }
+    .wrap { max-width: 1160px; margin: auto; padding: clamp(64px, 11vw, 120px) clamp(16px, 4vw, 36px); width: 100%; overflow: visible; }
 
     .eyebrow {
       font-family: 'Syne', 'Plus Jakarta Sans', sans-serif;
@@ -3041,7 +3045,7 @@
     .pricing-head { text-align: center; margin-bottom: 56px; }
     .pricing-head .sub { margin: auto; }
 
-    .pgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; align-items: start; }
+    .pgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; align-items: start; overflow: visible; padding-top: 24px; }
 
     .pcard {
       background: rgba(255, 252, 248, 0.88);
@@ -3055,6 +3059,7 @@
         border-color 0.35s ease;
       position: relative;
       box-shadow: 0 4px 24px rgba(28, 25, 22, 0.04);
+      overflow: visible;
     }
 
     .pcard:hover {
@@ -3066,7 +3071,7 @@
 
     .hot-badge {
       position: absolute;
-      top: -14px; left: 50%;
+      top: -16px; left: 50%;
       transform: translateX(-50%);
       background: var(--primary);
       color: white;
@@ -3075,6 +3080,7 @@
       padding: 5px 18px;
       border-radius: 100px;
       white-space: nowrap;
+      z-index: 10;
     }
 
     .pname { font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 5px; }
@@ -3837,7 +3843,6 @@
       </div>
 
       <div class="pcard hot reveal" style="transition-delay:.12s">
-        <div class="hot-badge">⚡ Most Popular</div>
         <div class="pname">Professional</div>
         <div class="pdesc">For growing restaurants &amp; retail shops</div>
         <div class="pprice"><sup>PKR</sup> 5,500 <span>/mo</span></div>
