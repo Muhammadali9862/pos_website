@@ -3035,12 +3035,137 @@
         linear-gradient(180deg, #faf7f1 0%, #f0ebe3 100%);
       border-block: 1px solid rgba(68, 60, 52, 0.09);
       color: var(--ink);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 3D Brick Surface Background */
+    .pricing-3d-surface {
+      position: absolute;
+      inset: 0;
+      perspective: 1200px;
+      perspective-origin: 50% 30%;
+      overflow: hidden;
+      pointer-events: all;
+      z-index: 1;
+    }
+
+    .pricing-3d-grid {
+      position: absolute;
+      left: 50%;
+      top: 40%;
+      transform: translateX(-50%) rotateX(65deg);
+      width: 120%;
+      height: 120%;
+      display: grid;
+      grid-template-columns: repeat(15, 1fr);
+      grid-template-rows: repeat(15, 1fr);
+      gap: 8px;
+      transform-style: preserve-3d;
+      animation: gridFloat 5s ease-in-out infinite;
+      transition: transform 0.3s ease-out;
+    }
+
+    @keyframes gridFloat {
+      0%, 100% { 
+        transform: translateX(-50%) rotateX(65deg) translateY(0); 
+      }
+      50% { 
+        transform: translateX(-50%) rotateX(65deg) translateY(-25px); 
+      }
+    }
+
+    .pricing-3d-tile {
+      background: linear-gradient(145deg, 
+        rgba(234, 88, 12, 0.45) 0%, 
+        rgba(251, 146, 60, 0.35) 50%, 
+        rgba(244, 239, 230, 0.8) 100%);
+      border: 2px solid rgba(234, 88, 12, 0.5);
+      border-radius: 10px;
+      transform-style: preserve-3d;
+      animation: tileWave 2.5s ease-in-out infinite;
+      animation-delay: calc(var(--tile-index) * 0.02s);
+      box-shadow: 
+        0 10px 20px rgba(234, 88, 12, 0.3),
+        0 6px 12px rgba(0, 0, 0, 0.2),
+        inset 0 3px 6px rgba(255, 255, 255, 0.6),
+        inset 0 -3px 8px rgba(234, 88, 12, 0.2);
+      min-height: 50px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .pricing-3d-tile::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+        rgba(255, 255, 255, 0.4) 0%, 
+        transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .pricing-3d-tile:hover::before {
+      opacity: 1;
+    }
+
+    @keyframes tileWave {
+      0%, 100% { 
+        transform: translateZ(0px) scale(1); 
+        opacity: 1;
+        filter: brightness(1);
+      }
+      50% { 
+        transform: translateZ(45px) scale(1.1); 
+        opacity: 1;
+        filter: brightness(1.2);
+      }
+    }
+
+    .pricing-3d-tile:nth-child(even) {
+      animation-duration: 3s;
+      background: linear-gradient(145deg, 
+        rgba(20, 184, 166, 0.4) 0%, 
+        rgba(45, 212, 191, 0.3) 50%,
+        rgba(244, 239, 230, 0.8) 100%);
+      border-color: rgba(20, 184, 166, 0.45);
+      box-shadow: 
+        0 10px 20px rgba(20, 184, 166, 0.28),
+        0 6px 12px rgba(0, 0, 0, 0.2),
+        inset 0 3px 6px rgba(255, 255, 255, 0.6),
+        inset 0 -3px 8px rgba(20, 184, 166, 0.18);
+    }
+
+    .pricing-3d-tile:nth-child(3n) {
+      animation-duration: 3.5s;
+      animation-delay: calc(var(--tile-index) * 0.03s);
+    }
+
+    .pricing-3d-surface::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, 
+        rgba(250, 247, 241, 0.2) 0%, 
+        rgba(250, 247, 241, 0.5) 60%, 
+        rgba(250, 247, 241, 0.9) 85%,
+        rgba(250, 247, 241, 1) 100%);
+      z-index: 2;
+      pointer-events: none;
     }
 
     #pricing .sh2 { color: var(--dark); }
     #pricing .eyebrow { color: var(--primary); }
     #pricing .sub { color: var(--muted); }
     #pricing .journey-head::before { color: rgba(28, 25, 22, 0.06); }
+
+    #pricing .wrap {
+      position: relative;
+      z-index: 10;
+    }
 
     .pricing-head { text-align: center; margin-bottom: 56px; }
     .pricing-head .sub { margin: auto; }
@@ -3809,6 +3934,10 @@
 
 <!-- PRICING -->
 <section id="pricing">
+<!-- 3D Brick Surface Background -->
+<div class="pricing-3d-surface">
+  <div class="pricing-3d-grid" id="pricing3DGrid"></div>
+</div>
 <div class="scene-bg" data-scene="pricing" data-bg-back="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=640&q=60" aria-hidden="true">
   <div class="scene-bg__plane scene-bg__plane--back"></div>
   <div class="scene-bg__plane scene-bg__plane--depth"></div>
@@ -4562,6 +4691,87 @@
     document.addEventListener('visibilitychange', function () {
       if (!document.hidden) tryPlay();
     });
+  })();
+
+  // Generate 3D Brick Surface for Pricing Section
+  (function() {
+    const grid = document.getElementById('pricing3DGrid');
+    if (!grid) {
+      console.log('3D Grid element not found');
+      return;
+    }
+    
+    console.log('Generating 3D tiles...');
+    const tileCount = 225; // 15x15 grid
+    
+    for (let i = 0; i < tileCount; i++) {
+      const tile = document.createElement('div');
+      tile.className = 'pricing-3d-tile';
+      tile.style.setProperty('--tile-index', i);
+      grid.appendChild(tile);
+    }
+    
+    console.log('3D tiles generated:', tileCount);
+    
+    // Add mouse interaction for 3D parallax effect
+    const surface = document.querySelector('.pricing-3d-surface');
+    const tiles = document.querySelectorAll('.pricing-3d-tile');
+    
+    if (surface) {
+      surface.addEventListener('mousemove', function(e) {
+        const rect = surface.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // Calculate rotation based on mouse position
+        const rotateY = ((x - centerX) / centerX) * 15;
+        const rotateX = ((y - centerY) / centerY) * -10;
+        
+        // Apply 3D rotation to grid
+        grid.style.animation = 'none';
+        grid.style.transform = `translateX(-50%) rotateX(${65 + rotateX}deg) rotateY(${rotateY}deg)`;
+        
+        // Add reflection effect to individual tiles
+        tiles.forEach((tile, index) => {
+          const tileRect = tile.getBoundingClientRect();
+          const tileCenterX = tileRect.left + tileRect.width / 2;
+          const tileCenterY = tileRect.top + tileRect.height / 2;
+          
+          const distanceX = e.clientX - tileCenterX;
+          const distanceY = e.clientY - tileCenterY;
+          const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+          
+          // Create spotlight effect on nearby tiles
+          if (distance < 200) {
+            const intensity = 1 - (distance / 200);
+            const mouseXPercent = ((e.clientX - tileRect.left) / tileRect.width) * 100;
+            const mouseYPercent = ((e.clientY - tileRect.top) / tileRect.height) * 100;
+            
+            tile.style.setProperty('--mouse-x', mouseXPercent + '%');
+            tile.style.setProperty('--mouse-y', mouseYPercent + '%');
+            tile.style.filter = `brightness(${1 + intensity * 0.4})`;
+            tile.style.transform = `translateZ(${45 + intensity * 20}px) scale(${1.1 + intensity * 0.1})`;
+          } else {
+            tile.style.filter = 'brightness(1)';
+          }
+        });
+      });
+      
+      surface.addEventListener('mouseleave', function() {
+        // Reset grid animation
+        grid.style.animation = 'gridFloat 5s ease-in-out infinite';
+        grid.style.transform = 'translateX(-50%) rotateX(65deg)';
+        
+        // Reset tiles
+        tiles.forEach(tile => {
+          tile.style.filter = 'brightness(1)';
+          tile.style.transform = '';
+        });
+      });
+    }
   })();
 </script>
 </body>
